@@ -89,14 +89,45 @@
                 }
             };
             
+            var receipt = {
+            Items: [//товарные позиции
+                 {
+                    label: 'Пожертвование', //наименование товара
+                    price:  document.getElementById('amount').value, //цена
+                    quantity: 1, //количество
+                    amount: document.getElementById('amount').value, //сумма
+                    vat: 20, //ставка НДС
+                    method: 0, // тег-1214 признак способа расчета - признак способа расчета
+                    object: 0, // тег-1212 признак предмета расчета - признак предмета товара, работы, услуги, платежа, выплаты, иного предмета расчета
+                }
+            ],
+            taxationSystem: 0, //система налогообложения; необязательный, если у вас одна система налогообложения
+            email: document.getElementById('email').value, //e-mail покупателя, если нужно отправить письмо с чеком
+            phone: document.getElementById('phone').value, //телефон покупателя в любом формате, если нужно отправить сообщение со ссылкой на чек
+            isBso: false, //чек является бланком строгой отчетности
+            amounts:
+            {
+                electronic: document.getElementById('amount').value, // Сумма оплаты электронными деньгами
+                advancePayment: 0.00, // Сумма из предоплаты (зачетом аванса) (2 знака после запятой)
+                credit: 0.00, // Сумма постоплатой(в кредит) (2 знака после запятой)
+                provision: 0.00 // Сумма оплаты встречным предоставлением (сертификаты, др. мат.ценности) (2 знака после запятой)
+            }
+        };
+
             if (isMonthly) {
                 options.accountId = document.getElementById('email').value;
                 options.data.cloudPayments = {
-                    recurrent: { interval: 'Month', period: 1 }
+                    CustomerReceipt: receipt,
+                    recurrent: { interval: 'Month', period: 1, customerReceipt: receipt}
+                };
+            }
+            else {
+                options.data.cloudPayments = {
+                    CustomerReceipt: receipt,
                 };
             }
             
-            widget.pay('auth', options, {
+            widget.pay('charge', options, {
                 onSuccess: function () {
                 alert("Спасибо! Пожертвование прошло успешно ❤️");
                 },
